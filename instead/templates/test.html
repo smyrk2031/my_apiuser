@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>マイク入力ページ</title>
+	<script>
+		var recognition;
+		var timer;
+
+		function startSpeechRecognition() {
+			recognition = new webkitSpeechRecognition();
+			recognition.continuous = false;
+			recognition.interimResults = false;
+
+			recognition.onstart = function() {
+				timer = setInterval(function(){
+					var remainingTime = parseInt(document.getElementById("time-left").innerHTML);
+					if (remainingTime > 0) {
+						document.getElementById("time-left").innerHTML = remainingTime - 1;
+					} else {
+						stopSpeechRecognition();
+					}
+				}, 1000);
+
+				document.getElementById("mic-btn").innerHTML = "入力中...";
+				document.getElementById("mic-btn").disabled = true;
+			};
+
+			recognition.onend = function() {
+				clearInterval(timer);
+
+				document.getElementById("mic-btn").innerHTML = "マイク入力開始";
+				document.getElementById("mic-btn").disabled = false;
+			};
+
+			recognition.start();
+			document.getElementById("time-left").innerHTML = "10";
+		}
+
+		function stopSpeechRecognition() {
+			recognition.stop();
+		}
+	</script>
+</head>
+<body>
+	<header>
+		<h1>ヘッダー</h1>
+        <hr><hr>
+	</header>
+
+	<main>
+		<button id="mic-btn" onclick="startSpeechRecognition()">マイク入力開始</button>
+		<span>残り時間: <span id="time-left"></span></span>
+	</main>
+
+	<footer>
+		<p>フッター</p>
+        <hr><hr>
+	</footer>
+</body>
+</html>

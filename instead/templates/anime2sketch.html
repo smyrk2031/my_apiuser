@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CLIP</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--<script type="text/javascript" src="../static/js/main.js"></script>-->
+    <style>
+        div.inline_block_create{
+            display: inline-block;
+            width: 40%;
+            height: 50%;
+            vertical-align: top;
+            /*background-color: aquamarine;*/
+        }
+    </style>
+
+</head>
+    <body>
+        <header>
+            <h1>画像変換 ~ anime2sketch ~</h1>
+        </header>
+
+        <main>
+            <form id="anime2sketch" action="{% url 'voice:anime2sketch_bg' %}">
+                <div class="inline_block_create">
+                    {% csrf_token %}
+                    <input id="file_sample" type="file" name="upload_image">
+                    <input class="btn" type="submit" value="アップロード" id="btn1">
+                    <div>
+                        <label>プレビュー</label>
+                    </div>
+                    <img id="file_preview" style="width:400px;">
+                </div>
+                <div class="inline_block_create">
+                    <br><br>
+                    <div>
+                        <label>判定結果</label>
+                    </div>
+                    <img id="result_anime2sketch" src="" style="width:400px;">
+                </div>
+            </form>
+
+        </main>
+        <footer>
+            <hr><hr>
+            <h3ここは、フッター</h3>
+            <hr>
+        </footer>
+    </body>
+    <script>
+        // アップロードされた画像をブラウザでプレビュー表示する
+        $(function() {
+            $('#file_sample').on('change', function(e) {
+                // 1枚だけ表示する
+                var file = e.target.files[0];
+                // ファイルのブラウザ上でのURLを取得する
+                var blobUrl = window.URL.createObjectURL(file);
+                // img要素に表示
+                $('#file_preview').attr('src', blobUrl);
+            });
+        });
+    </script>
+    <script type="text/javascript" src="../static/js/main.js"></script>
+</html>

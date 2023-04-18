@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>マイク入力</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>マイク入力</h1>
+    </header>
+    <main>
+        <button id="recordBtn">録音開始</button>
+        <button id="stopBtn" disabled>録音停止</button>
+        <div id="timer"></div>
+        <audio id="audio" controls></audio>
+    </main>
+    <footer>
+        <p>&copy; 2023 All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        const recordBtn = document.getElementById("recordBtn");
+        const stopBtn = document.getElementById("stopBtn");
+        const timer = document.getElementById("timer");
+        const audio = document.getElementById("audio");
+
+        let recorder;
+        let timeoutId;
+        let isRecording = false;
+
+        function startRecording() {
+            const constraints = {
+                audio: true
+            };
+            navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+                recorder = new MediaRecorder(stream);
+                recorder.start();
+                startTimer();
+            });
+        }
+
+        function startTimer() {
+            let seconds = 10;
+            timer.innerText = `残り時間：${seconds}秒`;
+            timeoutId = setInterval(function() {
+                seconds--;
+                timer.innerText = `残り時間：${seconds}秒`;
+                if (seconds === 0) {
+                    stopRecording();
+                }
+            }, 1000);
+        }
+
+        function stopRecording() {
+            clearInterval(timeoutId);
+            recorder.stop();
+            recorder.ondataavailable = function(event) {
+                const blob = new Blob([event.data], { type: 'audio/wav; codecs=opus' });
+                const url = URL.createObjectURL(blob);
+                audio.src = url;
+            };
+            recordBtn.disabled = false;
+            recordBtn.innerText = "再録音";
+            stopBtn.disabled = true;
+            isRecording = false;
+        }
+
+        recordBtn.addEventListener("click", function() {
+            if (!isRecording) {
+                startRecording();
+                isRecording = true;
+                recordBtn.disabled = true;
+                stopBtn.disabled = false;
+                recordBtn.innerText = "録音中";
+            }
+        });
+
+        stopBtn.addEventListener("click", function() {
+            if (isRecording) {
+                stopRecording();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>録音アプリ</title>
+    <style>
+      button {
+        padding: 10px 20px;
+        background-color: green;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      
+      button.recording {
+        background-color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>録音アプリ</h1>
+    </header>
+    
+    <main>
+      <button id="record-btn" onclick="record()">録音開始</button>
+      <button id="playback-btn" style="display: none;" onclick="playback()">再生する</button>
+      <p id="timer" style="display: none;"></p>
+    </main>
+    
+    <footer>
+        <hr>
+        <p>© 2023 Recording App</p>
+    </footer>
+    
+    <script>
+      const recordBtn = document.getElementById("record-btn");
+      const playbackBtn = document.getElementById("playback-btn");
+      const timer = document.getElementById("timer");
+      let mediaRecorder;
+      let chunks = [];
+      
+      function record() {
+        recordBtn.classList.add("recording");
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
+        timer.style.display = "block";
+        let timeLeft = 10;
+        timer.innerHTML = `残り時間: ${timeLeft}秒`;
+        let countdown = setInterval(() => {
+          timeLeft--;
+          timer.innerHTML = `残り時間: ${timeLeft}秒`;
+          if (timeLeft <= 0) {
+            clearInterval(countdown);
+            stopRecording();
+          }
+        }, 1000);
+      }
+      
+      function stopRecording() {
+        mediaRecorder.stop();
+        stream.getTracks().forEach(track => track.stop());
+        recordBtn.classList.remove("recording");
+        timer.style.display = "none";
+        playbackBtn.style.display = "block";
+      }
+      
+      function playback() {
+        let blob = new Blob(chunks, {type: "audio/ogg; codecs=opus"});
+        let audioUrl = URL.createObjectURL(blob);
+        let audio = new Audio(audioUrl);
+        audio.play();
+      }
+      
+      navigator.mediaDevices.getUserMedia({audio: true})
+        .then(stream => {
+          recordBtn.disabled = false;
+          recordBtn.innerHTML = "録音開始";
+          recordBtn.style.backgroundColor = "green";
+          recordBtn.style.cursor = "pointer";
+          window.stream = stream;
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.ondataavailable = e => {
+            chunks.push(e.data);
+          };
+          mediaRecorder.onstop = () => {
+            playbackBtn.style.display = "block";
+          };
+        })
+        .catch(err => console.error(err));
+    </script>
+  </body>
+</html>

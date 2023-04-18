@@ -1,0 +1,122 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CLIP</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--<script type="text/javascript" src="../static/js/main.js"></script>-->
+    <style>
+        div.inline_block_create{
+            display: inline-block;
+            width: 30%;
+            height: 50%;
+            vertical-align: top;
+            align-items: center;
+            text-align: center;
+            /*background-color: aquamarine;*/
+        }
+    </style>
+
+</head>
+    <body>
+        <header style="text-align: center;background-color: rgb(31, 213, 37);">
+            <h1>画像分類 ~ CLIP - zero shot ~</h1>
+            <label>①画像と②それを表す単語や文章の類似度を取得します。※英語の方が高精度</label><br>
+        </header>
+        <br><br>
+
+        <main>
+            <form id="clip_org_ajax" action="{% url 'voice:clip_org_bg' %}">
+                <div class="inline_block_create_">
+                    {% csrf_token %}
+
+                    <div class="inline_block_create">
+                        <input id="file_sample" type="file" name="upload_image">
+                        <!--<p>サンプル画像を使用できるようにする</p>-->
+                        <div>
+                            <label>プレビュー</label>
+                        </div>
+                        <img id="file_preview" style="width:200px;border: solid 10px #f0f0f0;">
+                    </div>
+
+                    <div class="inline_block_create">
+                        <div>
+                            <label>◆類似度判定用の文字列</label>
+                        </div>
+                        <div>
+                            <input type="text" name="txt1" value="human" style="width:400px;height:30px;font-size:18px;">
+                        </div>
+                        <div>
+                            <input type="text" name="txt2" value="animal" style="width:400px;height:30px;font-size:18px;">
+                            <!--<input type="text" name="txt2_result" style="width:100px;height:30px;font-size:18px;background-color: aqua;">-->
+                        </div>
+                        <div>
+                            <input type="text" name="txt3" value="material" style="width:400px;height:30px;font-size:18px;">
+                            <!--<input type="text" name="txt3_result" style="width:100px;height:30px;font-size:18px;background-color: aqua;">-->
+                        </div>
+                        <div>
+                            <input type="text" name="txt4" value="scenery" style="width:400px;height:30px;font-size:18px;">
+                            <!--<input type="text" name="txt4_result" style="width:100px;height:30px;font-size:18px;background-color: aqua;">-->
+                        </div>
+                        <div>
+                            <input type="text" name="txt5" value="" style="width:400px;height:30px;font-size:18px;">
+                            <!--<input type="text" name="txt5_result" style="width:100px;height:30px;font-size:18px;background-color: aqua;">-->
+                        </div>
+                        <br>
+                        <input class="btn" type="submit" value="CLIP実行（5secくらいかかります）" id="btn1">
+                    </div>
+                    <div class="inline_block_create">
+                        <!--<br><br>-->
+                        <div>
+                            <label>◇判定結果</label>
+                        </div>
+                        <div>
+                            <input type="text" name="txt1_result" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                        </div>
+                        <div>
+                            <input type="text" name="txt2_result" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                        </div>
+                        <div>
+                            <input type="text" name="txt3_result" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                        </div>
+                        <div>
+                            <input type="text" name="txt4_result" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                        </div>
+                        <div>
+                            <input type="text" name="txt5_result" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                        </div>
+                        <img id="result_clip" src="" style="width:400px;">
+                    </div>
+                </div>
+            </form>
+        </main>
+        <br><hr><br>
+        <div style="text-align:center;">
+            <h3>CLIPの利点</h3>
+            <ul style="margin: auto;">
+                <li>・学習をしなくても色んなものが判定できる</li>
+                <li>・判定の難易度を測る指標にできる</li>
+            </ul>
+        </div>
+        <footer>
+            <hr><hr>
+            <h3>ここはフッター</h3>
+            <hr>
+        </footer>
+    </body>
+    <script>
+        // アップロードされた画像をブラウザでプレビュー表示する
+        $(function() {
+            $('#file_sample').on('change', function(e) {
+                // 1枚だけ表示する
+                var file = e.target.files[0];
+                // ファイルのブラウザ上でのURLを取得する
+                var blobUrl = window.URL.createObjectURL(file);
+                // img要素に表示
+                $('#file_preview').attr('src', blobUrl);
+            });
+        });
+    </script>
+    <script type="text/javascript" src="../static/js/main.js"></script>
+</html>

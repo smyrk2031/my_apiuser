@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>マイク入力</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../static/js/main.js"></script>
+</head>
+<body>
+    <header>
+        <h1>マイク入力 ~whisper voice2text~</h1>
+    </header>
+
+    <main>
+
+        <form id="audio-form" method="POST" enctype="multipart/form-data" action="/whisper_v2t/"></form>
+            {% csrf_token %}
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <!-- 以下、録音機能のためのボタンやタイマーなどの要素 -->
+            <button id="recordBtn">録音開始</button>
+            <button id="stopBtn" disabled>録音停止</button>
+            <div id="timer"></div>
+            <audio id="audio" controls></audio>
+            <div id="transcript"></div>
+        </form>
+
+    </main>
+    <footer>
+        <p>&copy; 2023 All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        const recordBtn = document.getElementById("recordBtn");
+        const stopBtn = document.getElementById("stopBtn");
+        const timer = document.getElementById("timer");
+        const audio = document.getElementById("audio");
+
+        let recorder;
+        let timeoutId;
+        let isRecording = false;
+
+        // 録音開始（音声ストリームの取得）
+        function startRecording() {
+            const constraints = {
+                audio: true
+            };
+            console.log("音声ストリーム取得")
+
+            //navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+            navigator.mediaDevices.getUserMedia({audio: {sampleRate: 44100}}).then(function(stream) {
+                recorder = new MediaRecorder(stream);
+                recorder.start(9000); // 3秒ごとにデータを収集
+                recorder.ondataavailable = function(event) {
+                    // Ajax
+                    sendBlob(event.data); // 音声データが使用可能になったら、Blobオブジェクトをバックエンドに送信
+                }
+                startTimer();
+            });
+        }
+
+        function startTimer() {
+            let seconds = 10;
+            timer.innerText = `残り時間：${seconds}秒`;
+            timeoutId = setInterval(function() {
+                seconds--;
+                timer.innerText = `残り時間：${seconds}秒`;
+                if (seconds === 0) {
+                    stopRecording();
+                }
+            }, 1000);
+        }
+
+        // Ajaxが一度でも実行されると、レコード停止でaudioタグでの再生ができなくなるかも
+        function stopRecording() {
+            clearInterval(timeoutId);
+            recorder.stop();
+            recorder.ondataavailable = function(event) {
+                const blob = new Blob([event.data], { type: 'audio/wav; codecs=opus' });
+                const url = URL.createObjectURL(blob);
+                audio.src = url;
+            };
+            recordBtn.disabled = false;
+            recordBtn.innerText = "再録音";
+            stopBtn.disabled = true;
+            isRecording = false;
+        }
+
+        recordBtn.addEventListener("click", function() {
+            if (!isRecording) {
+                startRecording();
+                isRecording = true;
+                recordBtn.disabled = true;
+                stopBtn.disabled = false;
+                recordBtn.innerText = "録音中";
+            }
+        });
+
+        // 停止ボタンを押したら
+        stopBtn.addEventListener("click", function() {
+            if (isRecording) {
+                stopRecording();
+            }
+        });
+    </script>
+</body>
+</html>
