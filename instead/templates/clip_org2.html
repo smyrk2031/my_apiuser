@@ -1,0 +1,391 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CLIP</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--<script type="text/javascript" src="../static/js/main.js"></script>-->
+    <style>
+        div.inline_block_create{
+            display: inline-block;
+            width: 30%;
+            height: 50%;
+            vertical-align: top;
+            align-items: center;
+            text-align: center;
+        }
+        @media (min-width: 1380px) {
+            div.inline_block_create{
+                display: inline-block;
+                width: 30%;
+                height: 50%;
+                vertical-align: top;
+                align-items: center;
+                text-align: center;
+            }
+        }
+    </style>
+
+</head>
+    <body style="text-align: center;">
+        <header style="background-color: rgb(31, 213, 37);">
+            <h1>画像分類 ~ CLIP - zero shot ~</h1>
+            <h3>●入力画像を入力テキスト毎に類似度合いを出力する</h3>
+        </header>
+        
+
+        <main>
+            <form id="clip_org_ajax" action="{% url 'voice:clip_org_bg' %}" enctype="multipart/form-data">
+                <div>
+                    {% csrf_token %}
+                    <div>
+                        <div class="inline_block_create">
+                            <label>【 サンプルで試す 】</label>
+                            <label><input type="radio" name="sample" value="self" checked>なし </label>
+                            <label><input type="radio" name="sample" value="1">1 </label>
+                            <label><input type="radio" name="sample" value="2">2 </label>
+                            <label><input type="radio" name="sample" value="3">3 </label>
+                            <label><input type="radio" name="sample" value="4">4 </label>
+                            <label><input type="radio" name="sample" value="5">5 </label>
+                            <label><input type="radio" name="sample" value="6">6 </label>
+                        </div>
+
+                        <br>
+                        <label id="sample_description_element" style="display:none;">
+                            [サンプル説明]：
+                            <label id="sample_description"></label>
+                        </label>
+                        <br>
+
+                        <table border="5" width="80%" cellpadding="10"  bordercolor="green" style="text-align: center;margin: auto;">
+                            <tr>
+                                <th>No.</th>
+                                <th>入力画像</th>
+                                <th>入力テキスト</th>
+                                <th>相対評価[％]</th>
+                            </tr>
+                            <tr height="20%">
+                                <td>1</td>
+                                <td>
+                                    <label class="upload_ctrl1" for="file_sample1">
+                                        <!--<img id="file_preview1" src="{% static 'temp/noimage.png' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0; pointer-events: none;">-->
+                                        <img class="upload_ctrl1" id="file_preview1" src="{% static 'temp/noimage.png' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                                    </label>
+                                    <button id="reset_button1" style="display:none;">×</button>
+                                    <input class="upload_ctrl1" id="file_sample1" type="file" name="upload_image1" accept=".jpeg, .jpg, .png" style="display: none;">
+                                </td>
+                                <td rowspan="3">
+                                    <label>○画像を表すテキストを5つ指定できます</label><br>
+                                    <label>・画像に対して、各テキストを相対評価します</label><br>
+                                    <label>※テキストは英語の文章を推奨</label><br>
+                                    <div>
+                                        <input type="text" id="txt1_id" name="txt1" value="photo of human" style="width:400px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" id="txt2_id" name="txt2" value="photo of animal" style="width:400px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" id="txt3_id" name="txt3" value="photo of material" style="width:400px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                                    </div>
+                                    <div>
+                                        <input type="text" id="txt4_id" name="txt4" value="photo with landscape" style="width:400px;height:30px;font-size:18px;background-color: aqua;">
+                                    </div>
+                                    <div>
+                                        <input type="text" id="txt5_id" name="txt5" value="" style="width:400px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                                    </div>
+                                    <br>
+                                    <!-- Ajaxの実行ボタン -->
+                                    <input class="btn" type="submit" value="CLIP実行（約5sec/枚）" id="btn1">
+                                </td>
+                                <td>
+                                    <div>
+                                        <input type="text" name="result1_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="result1_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="result1_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="result1_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="result1_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>
+                                    <label class="upload_ctrl2" for="file_sample2">
+                                        <img class="upload_ctrl2" id="file_preview2" src="{% static 'temp/noimage.png' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                                    </label>
+                                    <button id="reset_button2" style="display:none;">×</button>
+                                    <input class="upload_ctrl2" id="file_sample2" type="file" name="upload_image2" style="display: none;">                                      
+                                </td>
+                                <td>
+                                    <div>
+                                        <input type="text" name="result2_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="result2_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="result2_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="result2_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="result2_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>
+                                    <label class="upload_ctrl3" for="file_sample3">
+                                        <img class="upload_ctrl3" id="file_preview3"  src="{% static 'temp/noimage.png' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                                    </label>
+                                    <button id="reset_button3" style="display:none;">×</button>
+                                    <input class="upload_ctrl3" id="file_sample3" type="file" name="upload_image3" style="display: none;">                                     
+                                </td>
+                                <td>
+                                    <div>
+                                        <input type="text" name="result3_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="result3_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="result3_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="result3_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="result3_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <img id="result_clip" src="" style="width:400px;">
+                    </div>
+                </div>
+            </form>
+        </main>
+
+        <br><hr><br>
+        
+        <div style="text-align:center;">
+            <h3>CLIPの利点</h3>
+            <ul style="margin: auto;">
+                <li>・学習をしなくても色んなものが判定できる</li>
+                <li>・判定の難易度を測る指標にできる</li>
+            </ul>
+        </div>
+        <footer>
+            <hr><hr>
+            <h3>ここはフッター</h3>
+            <hr>
+        </footer>
+    </body>
+    <script>
+        // 入力テキストを保持用の変数を定義
+        var txt1_temp = $('#txt1_id').val();
+        var txt2_temp = $('#txt2_id').val();
+        var txt3_temp = $('#txt3_id').val();
+        var txt4_temp = $('#txt4_id').val();
+        var txt5_temp = $('#txt5_id').val();
+
+        $(function() {
+            // サンプル用のラジオボタンが押されたら実行する
+            $('input[type="radio"][name="sample"]').on('change', function() {
+                // 関数：サンプル用のプレビュー表示
+                var setPreview = function(blobUrl, filename, i) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', blobUrl);
+                    xhr.responseType = 'blob';
+                    xhr.onload = function() {
+                        var blob = xhr.response;
+                        //console.log(blob)    // 画像サイズを表示
+                        var reader = new FileReader();  // FileReaderを生成
+                        reader.readAsDataURL(blob);  // Blobを読み込む
+                        reader.onloadend = function() {
+                            var base64data = reader.result;  // base64形式のデータを取得
+                            $('#file_preview' + i).attr('src', base64data); // プレビューを更新準備
+                            //$('#reset_button' + i).show();    // 「×」ボタンを表示
+
+                            // アップロード用の画像を指定する
+                            //var file = new File([blob], filename, { type: 'image/png' });  // BlobからFileオブジェクトを作成                            
+                            ////propメソッドの引数に属性名を指定する
+                            //var files = $('#file_sample' + i).prop('files');
+                            //if (files) {
+                            //    files[0] = file;
+                            //} else {
+                            //    files = [file];
+                            //}
+                            //$('#file_sample' + i).prop('files', files).trigger('input'); // ここでinputイベントを発火
+                        };
+                    };
+                    xhr.send();  // プレビューの更新が実行される（サーバからデータを取得する処理）
+                };
+                
+                // サンプル選択のラジオボタン処理
+                if ($(this).val() === 'self') {
+                    console.log("txt1_temp")
+                    console.log(txt1_temp)
+                    // 入力テキストのひとつ前の入力値に戻す
+                    $('#txt1_id').val(txt1_temp);
+                    $('#txt2_id').val(txt2_temp);
+                    $('#txt3_id').val(txt3_temp);
+                    $('#txt4_id').val(txt4_temp);
+                    $('#txt5_id').val(txt5_temp);
+
+                    // inputタグで画像アップロード：受付
+                    $('.upload_ctrl1').css('pointer-events', 'auto');
+                    $('.upload_ctrl2').css('pointer-events', 'auto');
+                    $('.upload_ctrl3').css('pointer-events', 'auto');
+
+                    // サンプル選択しない：「なし」の時
+                    console.log($(this).val())
+                    for (var i = 1; i <= 3; i++) {
+                        //$("#file_sample"+i).show();
+                        $('#file_sample' + i).val('');
+                        setPreview('{% static "temp/noimage.png" %}', 'noimage.png', i);
+                        $('#reset_button' + i).hide();    // 「×」ボタンを非表示
+                        $('#sample_description_element').hide();  // サンプル説明のlabelタグを非表示
+                        $('#sample_description').text("")
+                    }
+                } else {
+                    // サンプル選択する：ラジオボタンに紐づいた番号のサンプルを表示する
+                    // 入力テキストを保持する（サンプル画像は専用の入力テキストを使う為）
+                    txt1_temp = $('#txt1_id').val();
+                    txt2_temp = $('#txt2_id').val();
+                    txt3_temp = $('#txt3_id').val();
+                    txt4_temp = $('#txt4_id').val();
+                    txt5_temp = $('#txt5_id').val();
+
+                    for (var i = 1; i <= 3; i++) {
+                        // inputタグで画像アップロード：禁止
+                        $('.upload_ctrl1').css('pointer-events', 'none');
+                        $('.upload_ctrl2').css('pointer-events', 'none');
+                        $('.upload_ctrl3').css('pointer-events', 'none');
+
+                        var blobUrl = '{% static "temp/sample" %}' + $(this).val() + '_' + i + '.jpg';
+                        var filename = blobUrl.split('/').pop();
+                        // この関数でサンプルの反映を実行
+                        setPreview(blobUrl, filename, i);
+
+                        // 入力テキストをサンプルに併せて変更する
+                        if ($(this).val() === "1") {
+                            $('#txt1_id').val("Photo of a white 2000GT");
+                            $('#txt2_id').val("White Fairlady Z S130 Pictures");
+                            $('#txt3_id').val("Photo of Jaguar E-type");
+                            $('#txt4_id').val("photo of car");
+                            $('#txt5_id').val("photo of human");
+                            $('#sample_description_element').show();
+                            $('#sample_description').text("「2000GT」「フェアレディZ」「ジャガーEタイプ」の画像に対し、車種名で分類できるかを試すサンプルです。");
+                        }
+                        else if ($(this).val() === "2") {
+                            $('#txt1_id').val("Drive recorder photo on a cloudy day");
+                            $('#txt2_id').val("Driving record photo on a rainy day");
+                            $('#txt3_id').val("A drive record photo showing the road after the rain");
+                            $('#txt4_id').val("drive record photo");
+                            $('#txt5_id').val("");
+                            $('#sample_description_element').show();
+                            $('#sample_description').text("「曇りの日」「雨の日」「雨の後」のドラレコ写真を、文章で分類できるかを試すサンプルです。");
+                        }
+                    }
+                }
+            });
+
+
+
+
+
+
+            //$('#file_sample1').on('change', function(e) {
+            //    var file = e.target.files[0];
+            //    var blobUrl = window.URL.createObjectURL(file);
+            //    $('#file_preview1').attr('src', blobUrl);
+            //    $('#reset_button1').show(); // 「×」ボタンを表示する
+            //    $('#sample_button1').hide(); // 「sample_button1」を非表示にする
+            //});
+            //$('#sample_button1').on('click', function() {
+            //    var blobUrl = '{% static 'temp/sample1.jpg' %}'; // サンプル画像のURL
+            //    var xhr = new XMLHttpRequest();
+            //    xhr.open('GET', blobUrl);
+            //    xhr.responseType = 'blob';
+            //    xhr.onload = function() {
+            //        var blob = xhr.response;
+            //        var filename = blobUrl.split('/').pop(); // ファイル名を取得
+            //        var reader = new FileReader(); // FileReaderを生成
+            //        reader.readAsDataURL(blob); // Blobを読み込む
+            //        reader.onloadend = function() {
+            //            var base64data = reader.result; // base64形式のデータを取得
+            //            $('#file_preview1').attr('src', base64data); // プレビューを更新
+            //            var file = new File([blob], filename, { type: 'image/png' }); // BlobからFileオブジェクトを作成
+            //            $('#file_sample1').prop('files', [file]); // inputタグにFileオブジェクトを設定
+            //            $('#reset_button1').show(); // 「×」ボタンを表示する
+            //        };
+            //    };
+            //    xhr.send();
+            //    $('#reset_button1').show(); // 「×」ボタンを表示する
+            //    $(this).hide(); // 「sample_button1」を非表示にする
+            //});
+            //$('#reset_button1').on('click', function() {
+            //    $('#file_sample1').val(''); // inputタグをリセットする
+            //    $('#file_preview1').attr('src', '{% static 'temp/noimage.png' %}'); // 初期画像を表示する
+            //    $(this).hide(); // 「×」ボタンを非表示にする
+            //    $('#sample_button1').show(); // 「×」ボタンを表示する
+            //});
+
+
+
+            // -----------------------------------------------------------
+            // -----------------------------------------------------------
+            // ユーザがアップロードした画像ファイルをプレビュー表示する
+            $('#file_sample1').on('change', function(e) {
+                var file = e.target.files[0];
+                var blobUrl = window.URL.createObjectURL(file);
+                $('#file_preview1').attr('src', blobUrl);
+                $('#reset_button1').show(); // 「×」ボタンを表示する
+            });
+            $('#reset_button1').on('click', function() {
+                $('#file_sample1').val(''); // inputタグをリセットする
+                $('#file_preview1').attr('src', '{% static 'temp/noimage.png' %}'); // 初期画像を表示する
+                $(this).hide(); // 「×」ボタンを非表示にする
+            });
+            $('#file_sample2').on('change', function(e) {
+                var file = e.target.files[0];
+                var blobUrl = window.URL.createObjectURL(file);
+                $('#file_preview2').attr('src', blobUrl);
+                $('#reset_button2').show(); // 「×」ボタンを表示する
+            });
+            $('#reset_button2').on('click', function() {
+                $('#file_sample2').val(''); // inputタグをリセットする
+                $('#file_preview2').attr('src', '{% static 'temp/noimage.png' %}'); // 初期画像を表示する
+                $(this).hide(); // 「×」ボタンを非表示にする
+            });
+            $('#file_sample3').on('change', function(e) {
+                var file = e.target.files[0];
+                var blobUrl = window.URL.createObjectURL(file);
+                $('#file_preview3').attr('src', blobUrl);
+                $('#reset_button3').show(); // 「×」ボタンを表示する
+            });
+            $('#reset_button3').on('click', function() {
+                $('#file_sample3').val(''); // inputタグをリセットする
+                $('#file_preview3').attr('src', '{% static 'temp/noimage.png' %}'); // 初期画像を表示する
+                $(this).hide(); // 「×」ボタンを非表示にする
+            });
+            // -----------------------------------------------------------
+            // -----------------------------------------------------------
+        });
+    </script>
+
+    <script type="text/javascript" src="../static/js/main.js"></script>
+</html>

@@ -42,54 +42,7 @@ def index(requests):
 
 def clip_org(requests):
     print("◆func: clip_org はじまる")
-    #return render(requests, 'clip_org.html')
     return render(requests, 'clip_org2.html')
-
-# RestAPI_CLIPの実行
-def api_run_clip(base64_image_data, list_txt, list_txt_bin):
-    from urllib.parse import urlencode
-    import urllib.request
-    import http.client
-    """
-    base64_image_data: リクエストの画像入力 base64.b64encode(image).decode('utf-8') で、リサイズ後の画像データ
-    list_txt: リクエストのテキスト入力　リスト型 ["cat", "dog", "","",""]
-    list_txt_bin: リクエストのテキスト入力のblankを除去する為のマスクリスト [1,1,0,0,0]
-    result: リスト型式でテキスト毎の推論結果を出力する [0.2, 0.2, 0.2, 0.2, 0.2]
-    """
-    # RestAPIにリクエストを送る
-    url = '127.0.0.1:8000'
-    headers = {'Content-Type': 'application/json'}
-    data = {'img': base64_image_data, 'list_txt':list_txt, 'list_txt_bin':list_txt_bin}
-    json_data = json.dumps(data)
-
-    conn = http.client.HTTPConnection(url)
-    conn.request(method='POST', url='/myapi/openaiCLIP/', body=json_data, headers=headers)
-    response = conn.getresponse()
-    body = response.read().decode('utf-8')
-    conn.close()
-
-    print("◆- "*20)
-    response_data = json.loads(body)
-    #print(type(response_data))
-    print(response_data)
-
-    # 出力はこんなんなので、文字と類似度で構成された辞書に変換する
-    # {'clip_text': ['human : 0.2109', 'animal : 0.3818', 'material : 0.01843', 'scenery : 0.006992', 'animal : 0.3818']}
-    response_data_dict = {}
-    for item in response_data['clip_text']:
-        key, value = item.split(':')
-        response_data_dict[key.strip()] = float(value.strip())
-
-    print(response_data_dict)
-
-    # result：入力テキストで空白だった部分の推論結果として「0」を代入する
-    result = []
-    for i in list_txt:
-        try:
-            result.append(response_data_dict[i])
-        except:
-            result.append(0)
-    return result
 
 # CLIP実行時に、入力画像サイズをリサイズしたい
 def resize_image(image_data, set_maxlong=1200):
@@ -135,7 +88,7 @@ def clip_org_bg(requests):
     import http.client
 
     # Ajaxで画像取得→API→返値をブラウザに反映
-    print("◆func: clip_org_bg はじまる_ますたー")
+    print("◆func: clip_org_bg はじまる_230419")
     list_txt = [requests.POST.get("txt1"),
                 requests.POST.get("txt2"),
                 requests.POST.get("txt3"),
@@ -146,67 +99,49 @@ def clip_org_bg(requests):
     # 空白は類似度が高くなりがちなので、空白がある場合は除外したい。
     list_txt_bin = [x if list_txt[x] == True else None for x in range(len(list_txt))]
 
-    print(requests.GET)
-    print(requests.POST)
-    
-    print("リクエストのFILES")
-    print(requests.FILES.get('upload_image1', None))
-    print(requests.FILES.get('upload_image2', None))
-    print(requests.FILES.get('upload_image3', None))
+    # 画像枚数を確認して、画像の分だけAPIにリクエストを送る
 
-    # JsonResponse用の辞書型
-    result = {"clip_txt1":"", "clip_txt2":"", "clip_txt3":""}
+    # InMemoryUploadedFileオブジェクトからバイナリデータを取得する
+    image = requests.FILES['upload_image1'].read()
+    # バイナリデータをbase64エンコードする
+    base64_image_data = base64.b64encode(image).decode('utf-8')
+    # 画像をリサイズする
+    resized_image = resize_image(base64_image_data, 4000)
 
-    # 画像がサンプル画像かアップロード画像か判定
-    if requests.POST.get("sample") == "self":
-        print("モード：アップロード画像")
-        for i in range(1,4,1):
-            if requests.FILES.get('upload_image'+str(i)) == None:
-                print("画像が設定されていません。")
-                result["clip_txt" + str(i)] = ["NoImage", "NoImage", "NoImage", "NoImage", "NoImage"]
-            else:
-                try:
-                    print("upload_image" + str(i))
-                    # InMemoryUploadedFileオブジェクトからバイナリデータを取得する
-                    image = requests.FILES['upload_image'+str(i)].read()
-                    # バイナリデータをbase64エンコードする
-                    base64_image_data = base64.b64encode(image).decode('utf-8')
-                    # 画像をリサイズする
-                    base64_image_data = resize_image(base64_image_data, 4000)
-                    # RestAPI_CLIPの実行
-                    API_return = api_run_clip(base64_image_data, list_txt, list_txt_bin)
-                    result["clip_txt" + str(i)] = API_return
-                except Exception as e:
-                    print("upload_image" + str(i))
-                    print(f"エラーが発生しました: {e}")
-                    result["clip_txt" + str(i)] = ["err", "err", "err", "err", "err"]
-    else:
-        print("モード：サンプル画像")
-        for i in range(1,4,1):
-            try:
-                print("サンプル画像" + str(requests.POST.get("sample")))
-                sample_path = "C:/Users/kushi/python_venv/22_django4env39/try/voice/instead/static/temp/sample" + str(requests.POST.get("sample")) + "_" + str(i) + ".jpg"
-                # 画像を開く
-                with open(sample_path, "rb") as image_file:
-                    img = Image.open(image_file)
-                    # 画像をBase64エンコードする
-                    buffered = BytesIO()
-                    img.save(buffered, format="JPEG")
-                    base64_image_data = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                    # RestAPI_CLIPの実行
-                    API_return = api_run_clip(base64_image_data, list_txt, list_txt_bin)
-                    result["clip_txt" + str(i)] = API_return
-            except Exception as e:
-                print("upload_image(sample)" + str(i))
-                print(f"エラーが発生しました: {e}")
-                result["clip_txt" + str(i)] = ["err", "err", "err", "err", "err"]
+    # RestAPIにリクエストを送る
+    url = '127.0.0.1:8000'
+    headers = {'Content-Type': 'application/json'}
+    data = {'img': base64_image_data, 'list_txt':list_txt, 'list_txt_bin':list_txt_bin}
+    json_data = json.dumps(data)
 
+    conn = http.client.HTTPConnection(url)
+    conn.request(method='POST', url='/myapi/openaiCLIP/', body=json_data, headers=headers)
+    response = conn.getresponse()
+    body = response.read().decode('utf-8')
+    conn.close()
 
-        
+    print("◆- "*20)
+    response_data = json.loads(body)
+    print(type(response_data))
+    print(response_data)
+    # 出力はこんなんなので、文字と類似度で構成された辞書に変換する
+    # {'clip_text': ['human : 0.2109', 'animal : 0.3818', 'material : 0.01843', 'scenery : 0.006992', 'animal : 0.3818']}
+    response_data_dict = {}
+    for item in response_data['clip_text']:
+        key, value = item.split(':')
+        response_data_dict[key.strip()] = float(value.strip())
 
-    # レスポンス用のjsonデータ
-    #result = {"clip_txt":result}
-    #result = {"clip_txt1":result1, "clip_txt2":result2, "clip_txt3":result3}    # 画像ごとに分けたい
+    print(response_data_dict)
+
+    result = []
+    for i in list_txt:
+        try:
+            result.append(response_data_dict[i])
+        except:
+            result.append(0)
+    result = {"clip_txt":result}
+    #result = {"clip_txt1":result, "clip_txt2":result2, "clip_txt3":result3}    # 画像ごとに分ける
+
     print(result)
     print("◆-- "*20)
     return JsonResponse(result)

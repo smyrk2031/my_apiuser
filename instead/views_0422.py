@@ -70,7 +70,7 @@ def api_run_clip(base64_image_data, list_txt, list_txt_bin):
 
     print("◆- "*20)
     response_data = json.loads(body)
-    #print(type(response_data))
+    print(type(response_data))
     print(response_data)
 
     # 出力はこんなんなので、文字と類似度で構成された辞書に変換する
@@ -135,7 +135,7 @@ def clip_org_bg(requests):
     import http.client
 
     # Ajaxで画像取得→API→返値をブラウザに反映
-    print("◆func: clip_org_bg はじまる_ますたー")
+    print("◆func: clip_org_bg はじまる")
     list_txt = [requests.POST.get("txt1"),
                 requests.POST.get("txt2"),
                 requests.POST.get("txt3"),
@@ -148,65 +148,66 @@ def clip_org_bg(requests):
 
     print(requests.GET)
     print(requests.POST)
-    
-    print("リクエストのFILES")
+    print("リクエストのFILESを確認")
     print(requests.FILES.get('upload_image1', None))
-    print(requests.FILES.get('upload_image2', None))
-    print(requests.FILES.get('upload_image3', None))
 
-    # JsonResponse用の辞書型
-    result = {"clip_txt1":"", "clip_txt2":"", "clip_txt3":""}
-
-    # 画像がサンプル画像かアップロード画像か判定
-    if requests.POST.get("sample") == "self":
-        print("モード：アップロード画像")
-        for i in range(1,4,1):
-            if requests.FILES.get('upload_image'+str(i)) == None:
-                print("画像が設定されていません。")
-                result["clip_txt" + str(i)] = ["NoImage", "NoImage", "NoImage", "NoImage", "NoImage"]
-            else:
-                try:
-                    print("upload_image" + str(i))
-                    # InMemoryUploadedFileオブジェクトからバイナリデータを取得する
-                    image = requests.FILES['upload_image'+str(i)].read()
-                    # バイナリデータをbase64エンコードする
-                    base64_image_data = base64.b64encode(image).decode('utf-8')
-                    # 画像をリサイズする
-                    base64_image_data = resize_image(base64_image_data, 4000)
-                    # RestAPI_CLIPの実行
-                    API_return = api_run_clip(base64_image_data, list_txt, list_txt_bin)
-                    result["clip_txt" + str(i)] = API_return
-                except Exception as e:
-                    print("upload_image" + str(i))
-                    print(f"エラーが発生しました: {e}")
-                    result["clip_txt" + str(i)] = ["err", "err", "err", "err", "err"]
-    else:
-        print("モード：サンプル画像")
-        for i in range(1,4,1):
-            try:
-                print("サンプル画像" + str(requests.POST.get("sample")))
-                sample_path = "C:/Users/kushi/python_venv/22_django4env39/try/voice/instead/static/temp/sample" + str(requests.POST.get("sample")) + "_" + str(i) + ".jpg"
-                # 画像を開く
-                with open(sample_path, "rb") as image_file:
-                    img = Image.open(image_file)
-                    # 画像をBase64エンコードする
-                    buffered = BytesIO()
-                    img.save(buffered, format="JPEG")
-                    base64_image_data = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                    # RestAPI_CLIPの実行
-                    API_return = api_run_clip(base64_image_data, list_txt, list_txt_bin)
-                    result["clip_txt" + str(i)] = API_return
-            except Exception as e:
-                print("upload_image(sample)" + str(i))
-                print(f"エラーが発生しました: {e}")
-                result["clip_txt" + str(i)] = ["err", "err", "err", "err", "err"]
+    # 画像は最大3枚分入力されるので、直列で実行する
+    try:
+        print("upload_image1")
+        # InMemoryUploadedFileオブジェクトからバイナリデータを取得する
+        image = requests.FILES['upload_image1']#.read()   #file_preview
+        #uploaded_file = requests.FILES['upload_image3']
+        #with open(uploaded_file.temporary_file_path(), 'rb') as f:
+        #    image = f.read()
 
 
-        
+        print("base64エンコード")
+        # バイナリデータをbase64エンコードする
+        base64_image_data = base64.b64encode(image).decode('utf-8')
+        print("リサイズ")
+        # 画像をリサイズする
+        base64_image_data = resize_image(base64_image_data, 4000)
+        print("API_CLIP実行")
+        # RestAPI_CLIPの実行
+        result1 = api_run_clip(base64_image_data, list_txt, list_txt_bin)
+    except Exception as e:
+        print(f"upload_image1: エラーが発生しました: {e}")
+        result1 = ["err", "err", "err", "err", "err"]
+
+    try:
+        print("upload_image2")
+        # InMemoryUploadedFileオブジェクトからバイナリデータを取得する
+        image = requests.FILES['upload_image2'].read()
+        # バイナリデータをbase64エンコードする
+        base64_image_data = base64.b64encode(image).decode('utf-8')
+        # 画像をリサイズする
+        base64_image_data = resize_image(base64_image_data, 4000)
+        # RestAPI_CLIPの実行
+        result2 = api_run_clip(base64_image_data, list_txt, list_txt_bin)
+    except Exception as e:
+        print(f"upload_image2: エラーが発生しました: {e}")
+        result2 = ["err", "err", "err", "err", "err"]
+
+    try:
+        print("upload_image3")
+        # InMemoryUploadedFileオブジェクトからバイナリデータを取得する
+        image = requests.FILES['upload_image3'].read()
+        # バイナリデータをbase64エンコードする
+        base64_image_data = base64.b64encode(image).decode('utf-8')
+        # 画像をリサイズする
+        base64_image_data = resize_image(base64_image_data, 4000)
+        # RestAPI_CLIPの実行
+        result3 = api_run_clip(base64_image_data, list_txt, list_txt_bin)
+    except Exception as e:
+        print(f"upload_image3: エラーが発生しました: {e}")
+        result3 = ["err", "err", "err", "err", "err"]
+
+
+
 
     # レスポンス用のjsonデータ
     #result = {"clip_txt":result}
-    #result = {"clip_txt1":result1, "clip_txt2":result2, "clip_txt3":result3}    # 画像ごとに分けたい
+    result = {"clip_txt1":result1, "clip_txt2":result2, "clip_txt3":result3}    # 画像ごとに分けたい
     print(result)
     print("◆-- "*20)
     return JsonResponse(result)

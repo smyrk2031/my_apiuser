@@ -52,11 +52,47 @@ function b64toBlob(b64Data, contentType, sliceSize = 512) {
     return blob;
   }
 
+// CLIP結果のテキスト相対評価のうち、数字の最も大きいものを赤色太字にする
+function clip_result_marker(inputs) {
+    // 各input要素の値を取得し、配列に格納する
+    //var inputs = $("input[name^='result1']");
+    var values = [];
+    var hasNonNumericValue = false;
+    inputs.each(function(index) {
+      var value = parseFloat($(this).val());
+      if (isNaN(value)) {
+        hasNonNumericValue = true;
+        return false;
+      }
+      values.push(value);
+    });
+    
+    if (hasNonNumericValue) {
+        // 数字以外が混入している場合（errやNoImageの時）
+        inputs.css({"color": "blue", "font-weight": "normal"});
+    } else {
+        // 配列の中で最大値のインデックスを取得する
+        var maxIndex = values.indexOf(Math.max.apply(null, values));
+        // 各 input 要素のスタイルを設定する
+        inputs.each(function(index) {
+            if (index === maxIndex) {
+                $(this).css({"color": "red", "font-weight": "bold"});
+            } else {
+                $(this).css({"color": "black", "font-weight": "normal"});
+            }
+        });
+    };
+}
+
 $('#clip_org_ajax').on('submit', function(e) {
     e.preventDefault();
     let fd = new FormData($("#clip_org_ajax").get(0));
-    //fd.append($("#txt1"))
     console.log("clip_org_ajax実行")
+    // フォームデータを確認する
+    //for (let pair of fd.entries()) {
+    //    console.log(pair[0] + ': ' + pair[1]);
+    //}
+
     $.ajax({
         //'url': '{% url "voice:clip_org_bg" %}',
         'url': '/clip_org/clip_org_bg/',
@@ -69,17 +105,33 @@ $('#clip_org_ajax').on('submit', function(e) {
     .done(function(response){
         console.log("ajax-done")
         ////Ajax通信が成功した場合に実行する処理
-        console.log("clip-done")
-        console.log(response.clip_txt)
-        $('input[name="txt1_result"]').val(response.clip_txt[0]);
-        $('input[name="txt2_result"]').val(response.clip_txt[1]);
-        $('input[name="txt3_result"]').val(response.clip_txt[2]);
-        $('input[name="txt4_result"]').val(response.clip_txt[3]);
-        $('input[name="txt5_result"]').val(response.clip_txt[4]);
+        //console.log(response.clip_txt)
+        
+        $('input[name="result1_txt1"]').val(response.clip_txt1[0]);
+        $('input[name="result1_txt2"]').val(response.clip_txt1[1]);
+        $('input[name="result1_txt3"]').val(response.clip_txt1[2]);
+        $('input[name="result1_txt4"]').val(response.clip_txt1[3]);
+        $('input[name="result1_txt5"]').val(response.clip_txt1[4]);
 
-        //let blob = b64toBlob(response.image_url, "image/png");
-        //let imgUrl = URL.createObjectURL(blob);
-        //$('#result_clip').get(0).src = imgUrl;
+        $('input[name="result2_txt1"]').val(response.clip_txt2[0]);
+        $('input[name="result2_txt2"]').val(response.clip_txt2[1]);
+        $('input[name="result2_txt3"]').val(response.clip_txt2[2]);
+        $('input[name="result2_txt4"]').val(response.clip_txt2[3]);
+        $('input[name="result2_txt5"]').val(response.clip_txt2[4]);
+
+        $('input[name="result3_txt1"]').val(response.clip_txt3[0]);
+        $('input[name="result3_txt2"]').val(response.clip_txt3[1]);
+        $('input[name="result3_txt3"]').val(response.clip_txt3[2]);
+        $('input[name="result3_txt4"]').val(response.clip_txt3[3]);
+        $('input[name="result3_txt5"]').val(response.clip_txt3[4]);
+
+        // 数字の最も大きいものを赤色太字にする
+        //   ※数字以外が入っている場合はすべて黒文字（errなど）
+        clip_result_marker($("input[name^='result1']"))
+        clip_result_marker($("input[name^='result2']"))
+        clip_result_marker($("input[name^='result3']"))
+        console.log("clip-done 完了！！！")
+
     })
     // ↓ここでAjax処理に失敗した場合にコンソールにlogを出力するように設定している。
     .fail(function(jqXHR, textStatus, errorThrown) {

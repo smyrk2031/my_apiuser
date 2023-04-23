@@ -1,0 +1,256 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CLIP</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--<script type="text/javascript" src="../static/js/main.js"></script>-->
+    <style>
+        div.inline_block_create{
+            display: inline-block;
+            width: 30%;
+            height: 50%;
+            vertical-align: top;
+            align-items: center;
+            text-align: center;
+        }
+        @media (min-width: 1380px) {
+            div.inline_block_create{
+                display: inline-block;
+                width: 30%;
+                height: 50%;
+                vertical-align: top;
+                align-items: center;
+                text-align: center;
+            }
+        }
+    </style>
+
+</head>
+    <body style="text-align: center;">
+        <header style="background-color: rgb(31, 213, 37);">
+            <h1>画像分類 ~ CLIP - zero shot ~</h1>
+            <h3>●入力画像を入力テキスト毎に類似度合いを出力する</h3>
+        </header>
+        
+        <div class="inline_block_create">
+            <label>【 サンプルで試す 】</label>
+            <label><input type="radio" name="sample" checked>なし </label>
+            <label><input type="radio" name="sample">1 </label>
+            <label><input type="radio" name="sample">2 </label>
+            <label><input type="radio" name="sample">3 </label>
+            <label><input type="radio" name="sample">4 </label>
+            <label><input type="radio" name="sample">5 </label>
+            <label><input type="radio" name="sample">6 </label>
+        </div>
+        <main>
+            <form id="clip_org_ajax" action="{% url 'voice:clip_org_bg' %}">
+                <div>
+                    {% csrf_token %}
+                    <div>
+                        <table border="5" width="80%" cellpadding="10"  bordercolor="green" style="text-align: center;margin: auto;">
+                            <tr>
+                                <th>No.</th>
+                                <th>入力画像</th>
+                                <th>入力テキスト</th>
+                                <th>相対評価[％]</th>
+                            </tr>
+                            <tr height="20%">
+                                <td>1</td>
+                                <td>
+                                    <label for="file_sample1">
+                                        <img id="file_preview1" src="{% static 'temp/noimage.png' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                                    </label>
+                                    <button id="reset_button1" style="display:none;">×</button>
+                                    <input class="btn" type="button" value="サンプル画像1" id="sample_button1">
+                                    <input id="file_sample1" type="file" name="upload_image1" style="display: none;">
+                                </td>
+                                <td rowspan="3">
+                                    <label>○画像を表すテキストを5つ指定できます</label><br>
+                                    <label>・テキストを相対評価して画像を評価します</label><br>
+                                    <label>※テキストは英語の文章を推奨</label><br>
+                                    <div>
+                                        <input type="text" name="txt1" value="photo of human" style="width:400px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt2" value="photo of animal" style="width:400px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt3" value="photo of material" style="width:400px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt4" value="photo with landscape" style="width:400px;height:30px;font-size:18px;background-color: aqua;">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt5" value="" style="width:400px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                                    </div>
+                                    <br>
+                                    <input class="btn" type="submit" value="CLIP実行（約5sec/枚）" id="btn1">
+                                </td>
+                                <td>
+                                    <div>
+                                        <input type="text" name="txt1_result1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt2_result1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt3_result1" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt4_result1" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt5_result1" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>
+                                    <label for="file_sample2">
+                                        <img id="file_preview2" src="{% static 'temp/noimage.png' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                                    </label>
+                                    <button id="reset_button2" style="display:none;">×</button>
+                                    <button id="sample_button2">サンプル画像2</button>
+                                    <input id="file_sample2" type="file" name="upload_image2" style="display: none;">                                      
+                                </td>
+                                <td>
+                                    <div>
+                                        <input type="text" name="txt1_result2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt2_result2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt3_result2" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt4_result2" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt5_result2" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>
+                                    <label for="file_sample3">
+                                        <img id="file_preview3" src="{% static 'temp/noimage.png' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                                    </label>
+                                    <button id="reset_button3" style="display:none;">×</button>
+                                    <button id="sample_button3">サンプル画像3</button>
+                                    <input id="file_sample3" type="file" name="upload_image3" style="display: none;">                                      
+                                </td>
+                                <td>
+                                    <div>
+                                        <input type="text" name="txt1_result3" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt2_result3" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt3_result3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt4_result3" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="txt5_result3" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <img id="result_clip" src="" style="width:400px;">
+                    </div>
+                </div>
+            </form>
+        </main>
+
+        <br><hr><br>
+        
+        <div style="text-align:center;">
+            <h3>CLIPの利点</h3>
+            <ul style="margin: auto;">
+                <li>・学習をしなくても色んなものが判定できる</li>
+                <li>・判定の難易度を測る指標にできる</li>
+            </ul>
+        </div>
+        <footer>
+            <hr><hr>
+            <h3>ここはフッター</h3>
+            <hr>
+        </footer>
+    </body>
+    <script>
+        $(function() {
+
+            $('#file_sample1').on('change', function(e) {
+                var file = e.target.files[0];
+                var blobUrl = window.URL.createObjectURL(file);
+                $('#file_preview1').attr('src', blobUrl);
+                $('#reset_button1').show(); // 「×」ボタンを表示する
+                $('#sample_button1').hide(); // 「sample_button1」を非表示にする
+            });
+            $('#sample_button1').on('click', function() {
+                var blobUrl = '{% static 'temp/sample1.jpg' %}'; // サンプル画像のURL
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', blobUrl);
+                xhr.responseType = 'blob';
+                xhr.onload = function() {
+                    var blob = xhr.response;
+                    var filename = blobUrl.split('/').pop(); // ファイル名を取得
+                    var reader = new FileReader(); // FileReaderを生成
+                    reader.readAsDataURL(blob); // Blobを読み込む
+                    reader.onloadend = function() {
+                        var base64data = reader.result; // base64形式のデータを取得
+                        $('#file_preview1').attr('src', base64data); // プレビューを更新
+                        var file = new File([blob], filename, { type: 'image/png' }); // BlobからFileオブジェクトを作成
+                        $('#file_sample1').prop('files', [file]); // inputタグにFileオブジェクトを設定
+                        $('#reset_button1').show(); // 「×」ボタンを表示する
+                    };
+                };
+                xhr.send();
+                $('#reset_button1').show(); // 「×」ボタンを表示する
+                $(this).hide(); // 「sample_button1」を非表示にする
+            });
+            $('#reset_button1').on('click', function() {
+                $('#file_sample1').val(''); // inputタグをリセットする
+                $('#file_preview1').attr('src', '{% static 'temp/noimage.png' %}'); // 初期画像を表示する
+                $(this).hide(); // 「×」ボタンを非表示にする
+                $('#sample_button1').show(); // 「×」ボタンを表示する
+            });
+
+
+
+            $('#file_sample2').on('change', function(e) {
+                var file = e.target.files[0];
+                var blobUrl = window.URL.createObjectURL(file);
+                $('#file_preview2').attr('src', blobUrl);
+                $('#reset_button2').show(); // 「×」ボタンを表示する
+            });
+            $('#reset_button2').on('click', function() {
+                $('#file_sample2').val(''); // inputタグをリセットする
+                $('#file_preview2').attr('src', '{% static 'temp/noimage.png' %}'); // 初期画像を表示する
+                $(this).hide(); // 「×」ボタンを非表示にする
+            });
+
+
+            $('#file_sample3').on('change', function(e) {
+                var file = e.target.files[0];
+                var blobUrl = window.URL.createObjectURL(file);
+                $('#file_preview3').attr('src', blobUrl);
+                $('#reset_button3').show(); // 「×」ボタンを表示する
+            });
+            $('#reset_button3').on('click', function() {
+                $('#file_sample3').val(''); // inputタグをリセットする
+                $('#file_preview3').attr('src', '{% static 'temp/noimage.png' %}'); // 初期画像を表示する
+                $(this).hide(); // 「×」ボタンを非表示にする
+            });
+        });
+    </script>
+    <script type="text/javascript" src="../static/js/main.js"></script>
+</html>
