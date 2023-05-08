@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>APIカタログ</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../static/js/main.js"></script>
+</head>
+<body>
+    <header>
+        <h1>APIカタログ</h1>
+    </header>
+
+    <main>
+        <table border="4" style="width:80%; text-align: center;">
+            <tr>
+                <th>No</th>
+                <th>カテゴリ</th>
+                <th>AI名称</th>
+                <th>モード</th>
+                <th>備考</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td rowspan="3">画像</td>
+                <th rowspan="3">CLIP</th>
+                <td><a href="{% url 'voice:clip_org' %}">おためし</a></td>
+                <th rowspan="3">学習なしで使える最新画像判定</th>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><a href="{% url 'voice:clip_org' %}">練習する</a></td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><a href="{% url 'voice:clip_org' %}">使ってみる</a></td>
+            </tr>
+
+            <tr>
+                <td>4</td>
+                <td rowspan="3">画像</td>
+                <th rowspan="3">BLIP2</th>
+                <td><a href="{% url 'voice:clip_org' %}">おためし</a></td>
+                <th rowspan="3">画像を文章で説明するAI</th>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td><a href="{% url 'voice:clip_org' %}">練習する</a></td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td><a href="{% url 'voice:clip_org' %}">使ってみる</a></td>
+            </tr>
+
+            <tr>
+                <td>7</td>
+                <td rowspan="3">画像</td>
+                <th rowspan="3">SAM</th>
+                <td><a href="{% url 'voice:clip_org' %}">おためし</a></td>
+                <th rowspan="3">画像内から物体を検出する</th>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td><a href="{% url 'voice:clip_org' %}">練習する</a></td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td><a href="{% url 'voice:clip_org' %}">使ってみる</a></td>
+            </tr>
+
+            <tr>
+                <td>10</td>
+                <td rowspan="3">音声</td>
+                <th rowspan="3">Whisper</th>
+                <td><a href="{% url 'voice:clip_org' %}">おためし</a></td>
+                <th rowspan="3">音声を文章にするAI</th>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td><a href="{% url 'voice:clip_org' %}">練習する</a></td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td><a href="{% url 'voice:clip_org' %}">使ってみる</a></td>
+            </tr>
+
+            <tr>
+                <td>13</td>
+                <td rowspan="3">画像</td>
+                <th rowspan="3">OCR</th>
+                <td><a href="{% url 'voice:clip_org' %}">おためし</a></td>
+                <th rowspan="3">画像から文字を読みとる</th>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td><a href="{% url 'voice:clip_org' %}">練習する</a></td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td><a href="{% url 'voice:clip_org' %}">使ってみる</a></td>
+            </tr>
+
+            <tr>
+                <td>16</td>
+                <td rowspan="3">PDF</td>
+                <th rowspan="3">PDF-Reader</th>
+                <td><a href="{% url 'voice:clip_org' %}">おためし</a></td>
+                <th rowspan="3">PDFファイル編集する</th>
+            </tr>
+            <tr>
+                <td>17</td>
+                <td><a href="{% url 'voice:clip_org' %}">練習する</a></td>
+            </tr>
+            <tr>
+                <td>18</td>
+                <td><a href="{% url 'voice:clip_org' %}">使ってみる</a></td>
+            </tr>
+
+            <tr>
+                <td>19</td>
+                <td rowspan="3">3D</td>
+                <th rowspan="3">3D空間</th>
+                <td><a href="{% url 'voice:clip_org' %}">おためし</a></td>
+                <th rowspan="3">VRとARを使う</th>
+            </tr>
+            <tr>
+                <td>20</td>
+                <td><a href="{% url 'voice:clip_org' %}">練習する</a></td>
+            </tr>
+            <tr>
+                <td>21</td>
+                <td><a href="{% url 'voice:clip_org' %}">使ってみる</a></td>
+            </tr>
+          </table>
+    </main>
+    <footer>
+        <p>&copy; 2023 All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

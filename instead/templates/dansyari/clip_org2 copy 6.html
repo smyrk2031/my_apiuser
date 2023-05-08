@@ -7,23 +7,29 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!--<script type="text/javascript" src="../static/js/main.js"></script>-->
     <style>
-        div.inline_block_create{
-            display: inline-block;
-            width: 30%;
-            height: 50%;
-            vertical-align: top;
-            align-items: center;
-            text-align: center;
+        .inline_block_create {
+          width: 100%;
+          height: 50%;
+          vertical-align: top;
+          align-items: center;
+          text-align: center;
+          box-sizing: border-box; /* ボーダーやパディングを含めた要素全体の幅を指定 */
         }
-        @media (min-width: 1380px) {
-            div.inline_block_create{
-                display: inline-block;
-                width: 30%;
-                height: 50%;
-                vertical-align: top;
-                align-items: center;
-                text-align: center;
-            }
+        
+        .inline_block_create input[type="text"] {
+          width: calc(70% - 10px); /* 70% - 10px (両方のdiv要素の幅の合計が100%を超えないようにするため) */
+          height: 30px;
+          font-size: 18px;
+          /*background-color: rgb(255, 150, 150);*/
+          margin-right: 10px; /* inputとselectの間に10pxのスペースを空ける */
+          box-sizing: border-box; /* ボーダーやパディングを含めた要素全体の幅を指定 */
+        }
+        
+        .inline_block_create select {
+          width: calc(30% - 10px); /* 30% - 10px (両方のdiv要素の幅の合計が100%を超えないようにするため) */
+          height: 30px;
+          font-size: 18px;
+          box-sizing: border-box; /* ボーダーやパディングを含めた要素全体の幅を指定 */
         }
     </style>
 
@@ -40,7 +46,7 @@
                 <div>
                     {% csrf_token %}
                     <div>
-                        <div class="inline_block_create">
+                        <div>
                             <label>【 サンプルで試す 】</label>
                             <label><input type="radio" name="sample" value="self" checked>なし </label>
                             <label><input type="radio" name="sample" value="1">1 </label>
@@ -79,9 +85,16 @@
                                     <label>○画像を表すテキストを5つ指定できます</label><br>
                                     <label>・画像に対して、各テキストを相対評価します</label><br>
                                     <label>※テキストは英語の文章を推奨</label><br>
-                                    <div>
-                                        <input type="text" id="txt1_id" name="txt1" value="photo of human" style="width:400px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
-                                    </div>
+                                   
+                                    <div class="inline_block_create">
+                                        <input type="text" id="txt1_id" name="txt1" value="photo of human" style="background-color: rgb(255, 150, 150);">
+                                        <select>
+                                          <option value="option1">なにもしない</option>
+                                          <option value="option2">メール通知</option>
+                                          <option value="option3">teams通知</option>
+                                        </select>
+                                      </div>
+
                                     <div>
                                         <input type="text" id="txt2_id" name="txt2" value="photo of animal" style="width:400px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
                                     </div>
@@ -94,6 +107,7 @@
                                     <div>
                                         <input type="text" id="txt5_id" name="txt5" value="" style="width:400px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
                                     </div>
+
                                     <br>
                                     <!-- Ajaxの実行ボタン -->
                                     <input class="btn" type="submit" value="CLIP実行（約5sec/枚）" id="btn1">

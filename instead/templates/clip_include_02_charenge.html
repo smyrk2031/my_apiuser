@@ -1,0 +1,534 @@
+<!-- CLIP チャレンジ -->
+{% load static %}
+<style>
+    /* imgタグを入力禁止にする */
+    img {
+        pointer-events:none;
+    }
+</style>
+<form  class="btn_ajax_02" id="clip_org_ajax_02" method="POST" action="{% url 'instead:clip_org_bg' %}" enctype="multipart/form-data">
+    <div>
+        {% csrf_token %}
+        <div>
+            <div style="font-size:1.25rem ;display:inline-block;padding:20px; border-radius:0.8rem; background-color: white; border: 2px;solid:black;">
+                <label>【レベル選択】</label>
+                <!--<label><input type="radio" name="sample" value="self" checked>なし </label>-->
+                <label><input type="radio" name="radio_challenge" value="1" checked>レベル 1 </label>
+                <label><input type="radio" name="radio_challenge" value="2">レベル 2 </label>
+                <label><input type="radio" name="radio_challenge" value="3">レベル 3 </label>
+            </div>
+
+            <br><br>
+            <label id="sample_description_element_02" style="font-size:1.75rem;font-weight: bold;">
+                <label id="sample_description_02">
+                    ☆パン問題：プロンプト入力部に、同じ背景色の画像を判定できるようなプロンプトを作成してください。<br>
+                    ※ 判定の条件は、プロンプトの中で最も高い相対評価を得る事です。<br>
+                    ※ 相対評価が80%を超えるものが良好なプロンプトです。<br>
+                </label>
+            </label>
+            <br>
+
+            <td>
+                <label>◆説明文章を最大5つまで指定してください。</label><br>
+                <label>※テキストは英語文章の方が精度が良くなります</label><br>
+                
+                <div>
+                    <input type="text" id="txt1_id_02" name="txt1_02" value="" style="width:400px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                </div>
+                <div>
+                    <input type="text" id="txt2_id_02" name="txt2_02" value="" style="width:400px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                </div>
+                <div>
+                    <input type="text" id="txt3_id_02" name="txt3_02" value="" style="width:400px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                </div>
+                <div>
+                    <input type="text" id="txt4_id_02" name="txt4_02" value="" style="width:400px;height:30px;font-size:18px;background-color: aqua;">
+                </div>
+                <div>
+                    <input type="text" id="txt5_id_02" name="txt5_02" value="" style="width:400px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                </div>
+
+                <br>
+                <!-- Ajaxの実行ボタン -->
+                <input class="btn_ajax_02" type="submit" value="CLIP実行（約50sec/回）" id="btn_ajax" style="font-size:1.5rem;">
+                <label style="font-size:1.25rem;text-decoration-line: underline;">
+                    点数：
+                    <label name="incorrect_02" style="font-size:1.75rem;color: red;font-weight: bold;"></label>
+                    / 12点 （正解率:
+                    <label name="accuracy_02" style="font-size:1.25rem;"></label>
+                    ％）
+                </label>
+
+                <!-- 正解ラベル（隠したままでOK） -->
+                <input id="ground_truth_02" name="ground_truth_02" value="0,0,0,0,1,1,1,1,2,2,2,2" style="display:none;">
+                <br><br>
+
+            </td>
+            <!-- 1列目 -->
+            <div style="display: inline-block;">
+                <table border="5" cellpadding="10" bordercolor="green" style="text-align: center;width:20%; margin:auto;">
+                    <tr>
+                        <th>入力画像</th>
+                        <th>相対評価[％]</th>
+                    </tr>
+                    <tr height="20%">
+                        <!--<td>1</td>-->
+                        <td id="td_img1_02" bgcolor="#FFFFFF">
+                            <label class="upload_ctrl1_02" for="file_sample1_02">
+                                <!--<img class="upload_ctrl1_02" id="file_preview1_02" src="{% static 'temp/noimage.png' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">-->
+                                <img class="upload_ctrl1_02" id="file_preview1_02" src="{% static 'temp/challenge1_1.jpg' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                            </label>
+                            <button id="reset_button1_02" style="display:none;">×</button>
+                            <input class="upload_ctrl1_02" id="file_sample1_02" type="file" name="upload_image1_02" accept=".jpeg, .jpg, .png" style="display: none;">
+                        </td>
+
+                        <td>
+                            <div>
+                                <input type="text" name="result1_02_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result1_02_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result1_02_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                            </div>
+                            <div>
+                                <input type="text" name="result1_02_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                            </div>
+                            <div>
+                                <input type="text" name="result1_02_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <!--<td>2</td>-->
+                        <td id="td_img2_02" bgcolor="#FFFFFF">
+                            <label class="upload_ctrl2_02" for="file_sample2_02">
+                                <img class="upload_ctrl2_02" id="file_preview2_02" src="{% static 'temp/challenge1_2.jpg' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                            </label>
+                            <button id="reset_button2_02" style="display:none;">×</button>
+                            <input class="upload_ctrl2_02" id="file_sample2_02" type="file" name="upload_image2_02" style="display: none;">                                      
+                        </td>
+                        <td>
+                            <div>
+                                <input type="text" name="result2_02_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result2_02_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result2_02_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                            </div>
+                            <div>
+                                <input type="text" name="result2_02_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                            </div>
+                            <div>
+                                <input type="text" name="result2_02_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <!--<td>3</td>-->
+                        <td id="td_img3_02" bgcolor="#FFFFFF">
+                            <label class="upload_ctrl3_02" for="file_sample3_02">
+                                <img class="upload_ctrl3_02" id="file_preview3_02"  src="{% static 'temp/challenge1_3.jpg' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                            </label>
+                            <button id="reset_button3_02" style="display:none;">×</button>
+                            <input class="upload_ctrl3_02" id="file_sample3_02" type="file" name="upload_image3_02" style="display: none;">                                     
+                        </td>
+                        <td>
+                            <div>
+                                <input type="text" name="result3_02_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result3_02_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result3_02_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                            </div>
+                            <div>
+                                <input type="text" name="result3_02_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                            </div>
+                            <div>
+                                <input type="text" name="result3_02_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <!--<td>4</td>-->
+                        <td id="td_img4_02" bgcolor="#FFFFFF">
+                            <label class="upload_ctrl4_02" for="file_sample4_02">
+                                <img class="upload_ctrl4_02" id="file_preview4_02"  src="{% static 'temp/challenge1_4.jpg' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                            </label>
+                            <button id="reset_button4_02" style="display:none;">×</button>
+                            <input class="upload_ctrl4_02" id="file_sample4_02" type="file" name="upload_image4_02" style="display: none;">                                     
+                        </td>
+                        <td>
+                            <div>
+                                <input type="text" name="result4_02_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result4_02_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result4_02_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                            </div>
+                            <div>
+                                <input type="text" name="result4_02_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                            </div>
+                            <div>
+                                <input type="text" name="result4_02_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!-- 2列目 -->
+            <div style="display: inline-block;">
+                <table border="5" cellpadding="10" bordercolor="green" style="text-align: center;width:20%; margin:auto;">
+                    <tr>
+                        <th>入力画像</th>
+                        <th>相対評価[％]</th>
+                    </tr>
+                    <tr height="20%">
+                        <!--<td>5</td>-->
+                        <td id="td_img5_02" bgcolor="#FFFFFF">
+                            <label class="upload_ctrl5_02" for="file_sample5_02">
+                                <img class="upload_ctrl5_02" id="file_preview5_02" src="{% static 'temp/challenge1_5.jpg' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                            </label>
+                            <button id="reset_button5_02" style="display:none;">×</button>
+                            <input class="upload_ctrl5_02" id="file_sample5_02" type="file" name="upload_image5_02" accept=".jpeg, .jpg, .png" style="display: none;">
+                        </td>
+
+                        <td>
+                            <div>
+                                <input type="text" name="result5_02_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result5_02_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result5_02_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                            </div>
+                            <div>
+                                <input type="text" name="result5_02_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                            </div>
+                            <div>
+                                <input type="text" name="result5_02_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <!--<td>6</td>-->
+                        <td id="td_img6_02" bgcolor="#FFFFFF">
+                            <label class="upload_ctrl6_02" for="file_sample6_02">
+                                <img class="upload_ctrl6_02" id="file_preview6_02" src="{% static 'temp/challenge1_6.jpg' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                            </label>
+                            <button id="reset_button6_02" style="display:none;">×</button>
+                            <input class="upload_ctrl6_02" id="file_sample6_02" type="file" name="upload_image6_02" style="display: none;">                                      
+                        </td>
+                        <td>
+                            <div>
+                                <input type="text" name="result6_02_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result6_02_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result6_02_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                            </div>
+                            <div>
+                                <input type="text" name="result6_02_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                            </div>
+                            <div>
+                                <input type="text" name="result6_02_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <!--<td>7</td>-->
+                        <td id="td_img7_02" bgcolor="#FFFFFF">
+                            <label class="upload_ctrl7_02" for="file_sample7_02">
+                                <img class="upload_ctrl7_02" id="file_preview7_02"  src="{% static 'temp/challenge1_7.jpg' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                            </label>
+                            <button id="reset_button7_02" style="display:none;">×</button>
+                            <input class="upload_ctrl7_02" id="file_sample7_02" type="file" name="upload_image7_02" style="display: none;">                                     
+                        </td>
+                        <td>
+                            <div>
+                                <input type="text" name="result7_02_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result7_02_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result7_02_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                            </div>
+                            <div>
+                                <input type="text" name="result7_02_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                            </div>
+                            <div>
+                                <input type="text" name="result7_02_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <!--<td>8</td>-->
+                        <td id="td_img8_02" bgcolor="#FFFFFF">
+                            <label class="upload_ctrl8_02" for="file_sample8_02">
+                                <img class="upload_ctrl8_02" id="file_preview8_02"  src="{% static 'temp/challenge1_8.jpg' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                            </label>
+                            <button id="reset_button8_02" style="display:none;">×</button>
+                            <input class="upload_ctrl8_02" id="file_sample8_02" type="file" name="upload_image8_02" style="display: none;">                                     
+                        </td>
+                        <td>
+                            <div>
+                                <input type="text" name="result8_02_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result8_02_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                            </div>
+                            <div>
+                                <input type="text" name="result8_02_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                            </div>
+                            <div>
+                                <input type="text" name="result8_02_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                            </div>
+                            <div>
+                                <input type="text" name="result8_02_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- 3列目 -->
+                <div style="display: inline-block;">
+                    <table border="5" cellpadding="10" bordercolor="green" style="text-align: center;width:20%; margin:auto;">
+                        <tr>
+                            <th>入力画像</th>
+                            <th>相対評価[％]</th>
+                        </tr>
+                        <tr height="20%">
+                            <!--<td>9</td>-->
+                            <td id="td_img9_02" bgcolor="#FFFFFF">
+                                <label class="upload_ctrl9_02" for="file_sample9_02">
+                                    <img class="upload_ctrl9_02" id="file_preview9_02" src="{% static 'temp/challenge1_9.jpg' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                                </label>
+                                <button id="reset_button9_02" style="display:none;">×</button>
+                                <input class="upload_ctrl9_02" id="file_sample9_02" type="file" name="upload_image9_02" accept=".jpeg, .jpg, .png" style="display: none;">
+                            </td>
+    
+                            <td>
+                                <div>
+                                    <input type="text" name="result9_02_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                                </div>
+                                <div>
+                                    <input type="text" name="result9_02_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                                </div>
+                                <div>
+                                    <input type="text" name="result9_02_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                                </div>
+                                <div>
+                                    <input type="text" name="result9_02_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                                </div>
+                                <div>
+                                    <input type="text" name="result9_02_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!--<td>10</td>-->
+                            <td id="td_img10_02" bgcolor="#FFFFFF">
+                                <label class="upload_ctrl10_02" for="file_sample10_02">
+                                    <img class="upload_ctrl10_02" id="file_preview10_02" src="{% static 'temp/challenge1_10.jpg' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                                </label>
+                                <button id="reset_button10_02" style="display:none;">×</button>
+                                <input class="upload_ctrl10_02" id="file_sample10_02" type="file" name="upload_image10_02" style="display: none;">                                      
+                            </td>
+                            <td>
+                                <div>
+                                    <input type="text" name="result10_02_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                                </div>
+                                <div>
+                                    <input type="text" name="result10_02_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                                </div>
+                                <div>
+                                    <input type="text" name="result10_02_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                                </div>
+                                <div>
+                                    <input type="text" name="result10_02_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                                </div>
+                                <div>
+                                    <input type="text" name="result10_02_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!--<td>11</td>-->
+                            <td id="td_img11_02" bgcolor="#FFFFFF">
+                                <label class="upload_ctrl11_02" for="file_sample11_02">
+                                    <img class="upload_ctrl11_02" id="file_preview11_02"  src="{% static 'temp/challenge1_11.jpg' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                                </label>
+                                <button id="reset_button11_02" style="display:none;">×</button>
+                                <input class="upload_ctrl11_02" id="file_sample11_02" type="file" name="upload_image11_02" style="display: none;">                                     
+                            </td>
+                            <td>
+                                <div>
+                                    <input type="text" name="result11_02_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                                </div>
+                                <div>
+                                    <input type="text" name="result11_02_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                                </div>
+                                <div>
+                                    <input type="text" name="result11_02_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                                </div>
+                                <div>
+                                    <input type="text" name="result11_02_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                                </div>
+                                <div>
+                                    <input type="text" name="result11_02_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!--<td>12</td>-->
+                            <td id="td_img12_02" bgcolor="#FFFFFF">
+                                <label class="upload_ctrl12_02" for="file_sample12_02">
+                                    <img class="upload_ctrl12_02" id="file_preview12_02"  src="{% static 'temp/challenge1_12.jpg' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                                </label>
+                                <button id="reset_button12_02" style="display:none;">×</button>
+                                <input class="upload_ctrl12_02" id="file_sample12_02" type="file" name="upload_image12_02" style="display: none;">                                     
+                            </td>
+                            <td>
+                                <div>
+                                    <input type="text" name="result12_02_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                                </div>
+                                <div>
+                                    <input type="text" name="result12_02_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                                </div>
+                                <div>
+                                    <input type="text" name="result12_02_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                                </div>
+                                <div>
+                                    <input type="text" name="result12_02_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                                </div>
+                                <div>
+                                    <input type="text" name="result12_02_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+
+
+            <img id="result_clip" src="" style="width:400px;">
+        </div>
+    </div>
+</form>
+
+<script>
+    // 入力テキストを保持用の変数を定義
+    var txt1_temp_02 = $('#txt1_id_02').val();
+    var txt2_temp_02 = $('#txt2_id_02').val();
+    var txt3_temp_02 = $('#txt3_id_02').val();
+    var txt4_temp_02 = $('#txt4_id_02').val();
+    var txt5_temp_02 = $('#txt5_id_02').val();
+
+    $(function() {
+        // サンプル用のラジオボタンが押されたら実行する
+        $('input[type="radio"][name="radio_challenge"]').on('change', function() {
+            // 関数：サンプル用のプレビュー表示
+            var setPreview = function(blobUrl, filename, i) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', blobUrl);
+                xhr.responseType = 'blob';
+                xhr.onload = function() {
+                    var blob = xhr.response;
+                    //console.log(blob)    // 画像サイズを表示
+                    var reader = new FileReader();  // FileReaderを生成
+                    reader.readAsDataURL(blob);  // Blobを読み込む
+                    reader.onloadend = function() {
+                        var base64data = reader.result;  // base64形式のデータを取得
+                        $('#file_preview' + i + "_02").attr('src', base64data); // プレビューを更新準備
+                        //$('#reset_button' + i).show();    // 「×」ボタンを表示
+                    };
+                };
+                xhr.send();  // プレビューの更新が実行される（サーバからデータを取得する処理）
+            };
+            
+            // サンプル選択のラジオボタン処理
+            if ($(this).val() === 'self') {
+                console.log("txt1_temp_02")
+                console.log(txt1_temp_02)
+                // 入力テキストのひとつ前の入力値に戻す
+                $('#txt1_id_02').val(txt1_temp_02);
+                $('#txt2_id_02').val(txt2_temp_02);
+                $('#txt3_id_02').val(txt3_temp_02);
+                $('#txt4_id_02').val(txt4_temp_02);
+                $('#txt5_id_02').val(txt5_temp_02);
+
+                // inputタグで画像アップロード：受付
+                $('.upload_ctrl1_02').css('pointer-events', 'auto');
+                $('.upload_ctrl2_02').css('pointer-events', 'auto');
+                $('.upload_ctrl3_02').css('pointer-events', 'auto');
+
+                // サンプル選択しない：「なし」の時
+                // チャレンジモードは「なし」が存在しない！からいったん変更なしで！後で消すよ
+                console.log($(this).val())
+                for (var i = 1; i <= 3; i++) {
+                    //$("#file_sample"+i).show();
+                    $('#file_sample' + i).val('');
+                    setPreview('{% static "temp/noimage.png" %}', 'noimage.png', i);
+                    $('#reset_button' + i).hide();    // 「×」ボタンを非表示
+                    $('#sample_description_element').hide();  // サンプル説明のlabelタグを非表示
+                    $('#sample_description').text("")
+                }
+            } else {
+                // サンプル選択する：ラジオボタンに紐づいた番号のサンプルを表示する
+                // 入力テキストを保持する（サンプル画像は専用の入力テキストを使う為）
+                txt1_temp_02 = $('#txt1_id_02').val();
+                txt2_temp_02 = $('#txt2_id_02').val();
+                txt3_temp_02 = $('#txt3_id_02').val();
+                txt4_temp_02 = $('#txt4_id_02').val();
+                txt5_temp_02 = $('#txt5_id_02').val();
+
+                for (var i = 1; i <= 12; i++) {
+                    // inputタグで画像アップロード：禁止
+                    $('.upload_ctrl1_02').css('pointer-events', 'none');
+                    $('.upload_ctrl2_02').css('pointer-events', 'none');
+                    $('.upload_ctrl3_02').css('pointer-events', 'none');
+
+                    var blobUrl = '{% static "temp/challenge" %}' + $(this).val() + '_' + i + '.jpg';
+                    var filename = blobUrl.split('/').pop();
+                    // この関数でサンプルの反映を実行
+                    setPreview(blobUrl, filename, i);
+
+                    // 入力テキストをサンプルに併せて変更する
+                    if ($(this).val() === "1") {
+                        $('#sample_description_element_02').show();
+                        $('#sample_description_02').html("☆パン問題：プロンプト入力部に、同じ背景色の画像を判定できるようなプロンプトを作成してください。<br>※ 判定の条件は、プロンプトの中で最も高い相対評価を得る事です。<br>※ 相対評価が80%を超えるものが良好なプロンプトです。<br>");
+                    }
+                    else if ($(this).val() === "2") {
+                        $('#sample_description_element_02').show();
+                        $('#sample_description_02').html("");
+                    }
+                    else if ($(this).val() === "3") {
+                        $('#sample_description_element_02').show();
+                        $('#sample_description_02').html("");
+                    }
+                }
+            }
+        });
+    })
+    
+    // ラジオボタンを変更する
+    //$("input[type='radio'][name='radio_challenge'][value='1']").prop("checked", true);
+    // 画像の背景色（初期値：レベル1）を設定する
+    $('#td_img1_02, #td_img2_02, #td_img3_02, #td_img4_02').css('background-color', 'rgb(255, 150, 150)');
+    $('#td_img5_02, #td_img6_02, #td_img7_02, #td_img8_02').css('background-color', 'rgb(255, 225, 150)');
+    $('#td_img9_02, #td_img10_02, #td_img11_02, #td_img12_02').css('background-color', 'rgb(150, 255, 100)');
+
+
+</script>

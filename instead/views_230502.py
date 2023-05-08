@@ -73,15 +73,11 @@ def api_run_clip(base64_image_data, list_txt, list_txt_bin):
     # RestAPIにリクエストを送る
     url = '127.0.0.1:8001'
     headers = {'Content-Type': 'application/json'}
-    #data = {'img': base64_image_data, 'list_txt':list_txt, 'list_txt_bin':list_txt_bin}
-    data = {'requested_API':'openaiCLIP', 'img': base64_image_data, 'list_txt':list_txt, 'list_txt_bin':list_txt_bin}    # 並列API
+    data = {'img': base64_image_data, 'list_txt':list_txt, 'list_txt_bin':list_txt_bin}
     json_data = json.dumps(data)
 
     conn = http.client.HTTPConnection(url)
     conn.request(method='POST', url='/myapi/openaiCLIP/', body=json_data, headers=headers)
-    #conn.request(method='POST', url='/myapi/openaiCLIP_acync_View/', body=json_data, headers=headers)    # 並列Asyncio版API・・うまくいかない
-    #conn.request(method='POST', url='/myapi/myAPI_asyncView/', body=json_data, headers=headers)    # 並列APIためし・・・
-    
     response = conn.getresponse()
     body = response.read().decode('utf-8')
     conn.close()
@@ -158,7 +154,6 @@ def clip_org_bg(requests):
     from urllib.parse import urlencode
     import urllib.request
     import http.client
-    import asyncio    # 並列化で時間短縮したい
 
     # Ajaxで画像取得→API→返値をブラウザに反映
     print("◆func: clip_org_bg はじまる_ますたー")
@@ -243,8 +238,6 @@ def clip_org_bg(requests):
                     buffered = BytesIO()
                     img.save(buffered, format="JPEG")
                     base64_image_data = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                    # 画像をリサイズする
-                    #base64_image_data = resize_image(base64_image_data, 4000)
                     # RestAPI_CLIPの実行
                     API_return = api_run_clip(base64_image_data, list_txt, list_txt_bin)
                     result["clip_txt" + str(i)] = API_return

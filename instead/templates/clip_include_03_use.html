@@ -1,0 +1,144 @@
+<!-- CLIP おためし -->
+{% load static %}
+
+<form id="clip_org_ajax" action="{% url 'instead:clip_org_bg' %}" enctype="multipart/form-data">
+    <div>
+        {% csrf_token %}
+        <div>
+            <div>
+                <label>【 サンプルで試す 】</label>
+                <label><input type="radio" name="sample" value="self" checked>なし </label>
+                <label><input type="radio" name="sample" value="1">1 </label>
+                <label><input type="radio" name="sample" value="2">2 </label>
+                <label><input type="radio" name="sample" value="3">3 </label>
+                <label><input type="radio" name="sample" value="4">4 </label>
+                <label><input type="radio" name="sample" value="5">5 </label>
+                <label><input type="radio" name="sample" value="6">6 </label>
+            </div>
+
+            <br>
+            <label id="sample_description_element" style="display:none;">
+                [サンプル説明]：
+                <label id="sample_description"></label>
+            </label>
+            <br>
+
+            <table border="5" cellpadding="10" bordercolor="green" style="text-align: center;width:80%;margin: auto;">
+                <tr>
+                    <th>No.</th>
+                    <th>入力画像</th>
+                    <th>入力テキスト</th>
+                    <th>相対評価[％]</th>
+                </tr>
+                <tr height="20%">
+                    <td>1</td>
+                    <td>
+                        <label class="upload_ctrl1" for="file_sample1">
+                            <img class="upload_ctrl1" id="file_preview1" src="{% static 'temp/noimage.png' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                        </label>
+                        <button id="reset_button1" style="display:none;">×</button>
+                        <input class="upload_ctrl1" id="file_sample1" type="file" name="upload_image1" accept=".jpeg, .jpg, .png" style="display: none;">
+                    </td>
+                    <td rowspan="3">
+                        <label>○画像を表すテキストを5つ指定できます</label><br>
+                        <label>・画像に対して、各テキストを相対評価します</label><br>
+                        <label>※テキストは英語の文章を推奨</label><br>
+                        
+                        <div>
+                            <input type="text" id="txt1_id" name="txt1" value="photo of human" style="width:400px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                        </div>
+                        <div>
+                            <input type="text" id="txt2_id" name="txt2" value="photo of animal" style="width:400px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                        </div>
+                        <div>
+                            <input type="text" id="txt3_id" name="txt3" value="photo of material" style="width:400px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                        </div>
+                        <div>
+                            <input type="text" id="txt4_id" name="txt4" value="photo with landscape" style="width:400px;height:30px;font-size:18px;background-color: aqua;">
+                        </div>
+                        <div>
+                            <input type="text" id="txt5_id" name="txt5" value="" style="width:400px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                        </div>
+
+                        <br>
+                        <!-- Ajaxの実行ボタン -->
+                        <input class="btn" type="submit" value="CLIP実行（約5sec/枚）" id="btn1">
+
+                    </td>
+                    <td>
+                        <div>
+                            <input type="text" name="result1_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                        </div>
+                        <div>
+                            <input type="text" name="result1_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                        </div>
+                        <div>
+                            <input type="text" name="result1_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                        </div>
+                        <div>
+                            <input type="text" name="result1_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                        </div>
+                        <div>
+                            <input type="text" name="result1_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>
+                        <label class="upload_ctrl2" for="file_sample2">
+                            <img class="upload_ctrl2" id="file_preview2" src="{% static 'temp/noimage.png' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                        </label>
+                        <button id="reset_button2" style="display:none;">×</button>
+                        <input class="upload_ctrl2" id="file_sample2" type="file" name="upload_image2" style="display: none;">                                      
+                    </td>
+                    <td>
+                        <div>
+                            <input type="text" name="result2_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                        </div>
+                        <div>
+                            <input type="text" name="result2_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                        </div>
+                        <div>
+                            <input type="text" name="result2_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                        </div>
+                        <div>
+                            <input type="text" name="result2_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                        </div>
+                        <div>
+                            <input type="text" name="result2_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>
+                        <label class="upload_ctrl3" for="file_sample3">
+                            <img class="upload_ctrl3" id="file_preview3"  src="{% static 'temp/noimage.png' %}" alt="no image" style="height:150px;border: solid 10px #f0f0f0;">
+                        </label>
+                        <button id="reset_button3" style="display:none;">×</button>
+                        <input class="upload_ctrl3" id="file_sample3" type="file" name="upload_image3" style="display: none;">                                     
+                    </td>
+                    <td>
+                        <div>
+                            <input type="text" name="result3_txt1" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 150, 150);">
+                        </div>
+                        <div>
+                            <input type="text" name="result3_txt2" style="width:100px;height:30px;font-size:18px;background-color: rgb(255, 225, 150);">
+                        </div>
+                        <div>
+                            <input type="text" name="result3_txt3" style="width:100px;height:30px;font-size:18px;background-color: rgb(150, 255, 100);">
+                        </div>
+                        <div>
+                            <input type="text" name="result3_txt4" style="width:100px;height:30px;font-size:18px;background-color: aqua;">
+                        </div>
+                        <div>
+                            <input type="text" name="result3_txt5" style="width:100px;height:30px;font-size:18px;background-color: rgb(0, 150, 255);">
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <img id="result_clip" src="" style="width:400px;">
+        </div>
+    </div>
+</form>

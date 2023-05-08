@@ -1,0 +1,155 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CLIP</title>
+    <link rel="stylesheet" href="{% static 'css/spinner.css' %}">
+    <link rel="stylesheet" href="{% static 'css/accordion.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--<script type="text/javascript" src="../static/js/main.js"></script>-->
+    <style>
+        .inline_block_create {
+          width: 100%;
+          height: 50%;
+          vertical-align: top;
+          align-items: center;
+          text-align: center;
+          box-sizing: border-box; /* ボーダーやパディングを含めた要素全体の幅を指定 */
+        }
+        
+        .inline_block_create input[type="text"] {
+          width: calc(70% - 10px); /* 70% - 10px (両方のdiv要素の幅の合計が100%を超えないようにするため) */
+          height: 30px;
+          font-size: 18px;
+          /*background-color: rgb(255, 150, 150);*/
+          margin-right: 10px; /* inputとselectの間に10pxのスペースを空ける */
+          box-sizing: border-box; /* ボーダーやパディングを含めた要素全体の幅を指定 */
+        }
+        
+        .inline_block_create select {
+          width: calc(30% - 10px); /* 30% - 10px (両方のdiv要素の幅の合計が100%を超えないようにするため) */
+          height: 30px;
+          font-size: 18px;
+          box-sizing: border-box; /* ボーダーやパディングを含めた要素全体の幅を指定 */
+        }
+    </style>
+</head>
+
+<body style="text-align: center;">
+    <header style="background-color: rgb(31, 213, 37);">
+        <h1>画像分類 ~ CLIP - zero shot ~</h1>
+        <h3>●入力画像を入力テキスト毎に類似度合いを出力する</h3>
+    </header>
+
+    <!-- 実行中のくるくる表示 -->
+    <div id="overlay">
+        <div class="cv-spinner">
+            <span class="spinner"></span>
+        </div>
+    </div>
+    
+
+    <main>
+        <ul class="accordion-area">
+            <li>
+                <section>
+                    <h3 class="accordion-title">説明</h3>
+                    <div class="accordion-box">
+                        <h2>せつめい！</h2>
+                        <p>CLIPは、2020年にopen-ai社(chatGPTを開発した会社)がOSSで公開したAIです。</p>
+                        <p>このAIは、画像を説明する文章が、どの程度適切かを判定します。</p>
+                        <p>ひとつの画像に対して複数の説明言葉を設定する事で、説明言葉を相対的に比較して最も適切な説明言葉を判定できます。</p>
+                        <p>これを使えば、路面が塗れているかどうかや、駐車枠が空いているかどうかなどを、簡単に自動判別できます。</p>
+                        <br>
+                        <p>最大の特徴は、学習不要なAIなのにも関わらず、様々な画像に対して適応できることです。</p>
+                        <p>ぜひ、おためしモードで動かしてみましょう！</p>
+                        <a href="https://github.com/openai/CLIP">URL:https://github.com/openai/CLIP</a>
+                        <p>◆ユーザに求められる事：いかに適切に説明言葉を作れるかが精度を左右します。</p>
+                    </div>
+                </section>
+            </li>
+            <li>
+                <section>
+                    <h3 class="accordion-title">おためし</h3>
+                    <div class="accordion-box" >
+                        <p style="font-size: 3.0rem;">画像をアップロードするか、サンプルを使いご利用いただけます！</p>
+                        <p style="font-size: 2.0rem;">※組織内のサーバで動いているので、組織外へデータが流出する事はありません。</p>
+                        <p style="font-size: 2.0rem;">※アップロードした画像は保存されません。</p>
+                        <!-- CLIP おためし -->
+                        {% include "./clip_include_01_try.html" %}
+                    </div>
+                </section>
+            </li>
+            <li>
+                <section>
+                    <h3 class="accordion-title">チャレンジ</h3>
+                    <div class="accordion-box">
+                        <p style="font-size: 3.0rem;">説明言葉（プロンプト）作りの練習をしましょう！</p>
+                        <!-- CLIP チャレンジ -->
+                        {% include "./clip_include_02_charenge.html" %}
+                    </div>
+                </section>
+            </li>
+            <li>
+                <section>
+                    <h3 class="accordion-title">使う</h3>
+                    <div class="accordion-box">
+                        <p style="font-size: 3.0rem;">いくつかのモードで使うことができます</p>
+                        <p style="font-size: 2.0rem;">モード①：指定したフォルダ内の全ての画像に実行</p>
+                        <p style="font-size: 2.0rem;">モード②：指定したカメラの画像に対して、定期的にに実行</p>
+                        <p style="font-size: 2.0rem;">※この機能はテスト中です。使用を希望される場合は運営までご連絡ください。</p>
+                        <!-- CLIP 使う -->
+                        {% include "./clip_include_03_use.html" %}
+                    </div>
+                </section>
+            </li>
+    </main>
+
+    <br><hr><br>
+    
+    <div style="text-align:center;">
+        <h3>なんか書きたいことがあれば・・</h3>
+        <section style="margin: auto;">
+            <li>あああああ</li>
+            <li>いいいいい</li>
+        </section>
+    </div>
+    <footer>
+        <hr><hr>
+        <h3>ここはフッター</h3>
+        <p>&copy; 2023 All Rights Reserved.</p>
+        <hr>
+    </footer>
+</body>
+
+
+<script>
+    //アコーディオンをクリックした時の動作
+    $('.accordion-title').on('click', function() {//タイトル要素をクリックしたら
+        $('.accordion-box').slideUp(500);//クラス名.boxがついたすべてのアコーディオンを閉じる
+            
+        var findElm = $(this).next(".accordion-box");//タイトル直後のアコーディオンを行うエリアを取得
+            
+        if($(this).hasClass('close')){//タイトル要素にクラス名closeがあれば
+            $(this).removeClass('close');//クラス名を除去    
+        }else{//それ以外は
+            $('.close').removeClass('close'); //クラス名closeを全て除去した後
+            $(this).addClass('close');//クリックしたタイトルにクラス名closeを付与し
+            $(findElm).slideDown(500);//アコーディオンを開く
+        }
+    });
+
+    //ページが読み込まれた際にopenクラスをつけ、openがついていたら開く動作※不必要なら下記全て削除
+    $(window).on('load', function(){
+        //$('.accordion-area li:first-of-type section').addClass("open"); //accordion-areaのはじめのliにあるsectionにopenクラスを追加
+        $(".open").each(function(index, element){ //openクラスを取得
+            var Title =$(element).children('.accordion-title'); //openクラスの子要素のtitleクラスを取得
+            $(Title).addClass('close');       ///タイトルにクラス名closeを付与し
+            var Box =$(element).children('.accordion-box'); //openクラスの子要素boxクラスを取得
+            $(Box).slideDown(500);          //アコーディオンを開く
+        });
+    });
+</script>
+<script type="text/javascript" src="../static/js/main.js"></script>
+</html>
